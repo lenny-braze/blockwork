@@ -1,0 +1,40 @@
+{
+  "name": "blooker",
+  "version": "0.0.0",
+  "description": "Looker block tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "blooker": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabio-looker/blooker.git"
+  },
+  "keywords": [
+    "lookml",
+    "block",
+    "looker"
+  ],
+  "author": "Fabio Beltramini",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/fabio-looker/blooker/issues"
+  },
+  "homepage": "https://github.com/fabio-looker/blooker#readme",
+  "dependencies": {
+    "blob": "0.0.4",
+    "bluebird": "^3.5.1",
+    "cursive": "^0.3.0",
+    "dot": "^1.1.2",
+    "download-git-repo": "^1.0.2",
+    "json-editor": "^0.7.28",
+    "jsonschema": "^1.2.2",
+    "minimist": "^1.2.0",
+    "promise-readable": "^2.1.0",
+    "prompt": "^1.0.0",
+    "restify": "^6.3.4"
+  }
+}

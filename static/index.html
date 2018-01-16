@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Blooker Config Editor</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<!-- CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script>var pSchema=$.getJSON("/schema.json")</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/json-editor/0.7.28/jsoneditor.min.js" integrity="sha256-51+oMmpgSgS4jV5/DcGKnDHIOL6Jeie2i7ka6sPQVro=" crossorigin="anonymous"></script>
+	<link rel='stylesheet' href='//cdn.jsdelivr.net/foundation/5.0.2/css/foundation.min.css'>
+	<link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+<!---->
+<!-- Local -/->
+<script src="/modules/jquery/jquery.min.js"/></script>
+<script>var fetchTypes=$.getJSON("/api/types")</script>
+<script src="/modules/jsoneditor/jsoneditor.min.js"/></script>
+	<link rel='stylesheet' href='/modules/font-awesome/font-awesome.min.css'>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" integrity="sha256-NTds7atVCDeolLUzbcl45lx4gJYO+hNXCaX1wC2HQHc=" crossorigin="anonymous" />
+<!---->
+<style>
+/*Inline*/
+	.d-n{style:display:none}
+	/*Layout*/
+	.d-fa,.d-fb {display:flex;align-items:center;}
+	.d-fa{justify-content: space-around;}
+	.d-fb{justify-content: space-between;}
+	.d-n {display:none;}
+	.d-ib{display:inline-block}
+	.mv-1{margin-top:1em;margin-bottom:1em}
+	.w-f,form {width:100%}
+	body{margin:0 0 3em 0; width:100%; min-width:320px}
+	/*Style*/
+	.err {color:#808;border:1px solid #808;background-color: #FDD;}
+	.warn {color:#A80;border:1px solid #A80;background-color: #FFD;}
+	.ok {color:#080;border:1px solid #080;background-color: #DFD;}
+	.info {color:#008;border:1px solid #008;background-color: #DDF;}
+	.pending {color:#666;background-color: #DDD;}
+	.round{border-radius:0.5em;padding:0.5em;}
+	#editor>div>h3>span{display:none} /* "root" title */
+	#editor input+p{display:none}
+	#editor input:focus+p{display:block}
+	#editor textarea+p{display:none}
+	#editor textarea:focus+p{display:block}
+	#editor select+p{display:none}
+	#editor select:focus+p{display:block}
+	#editor select+p{display:none}
+	#editor select:focus+p{display:block}
+</style>
+</head>
+<body>
+	<div id="flash-msg" class="d-n round"></div>
+	<div id="top-bar" class="d-fb">
+		<h1>
+	</div>
+	<div id="main">
+		<div class="d-n ready edit">
+			<form id="edit-form">
+				<div id="editor"></div>
+				<div id='edit-indicator'></div>
+				<center><input type="submit" style="border:solid 1px black" value="Save" class="button" /></center>
+				
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+//JSON Editor Settings
+JSONEditor.defaults.theme = 'foundation5';
+JSONEditor.defaults.iconlib = 'fontawesome4';
+
+pSchema.then((schema)=>{
+			Object.assign(schema,{
+					disable_collapse:true,
+					disable_properties:true
+				})
+			var editor = new JSONEditor($("#editor")[0],schema)
+			$('#edit-form').on("submit",function(evt){
+				evt.preventDefault();
+				var err=editor.validate();
+				msg({tgt:$("#edit-indicator"),st:"err"})(err.join(", "))
+				$('#edit-indicator').toggle(!!err.length);
+				if(err.length){return}
+				$.ajax({
+						type: "POST",
+						url: "/submit",
+						data:JSON.stringify(editor.getValue()),
+						contentType: "application/json",
+						dataType: "json"
+					})
+				.then(msg({st:"ok"}))
+				.catch(msg)
+			})
+			$(".ready").show()
+	})
+	
+function msg(x){
+		if(!x){ return curryMsg({}) }
+		if(x.tgt===undefined && x.st===undefined && x.msg===undefined){
+				curryMsg({})(x)
+				return x
+			}
+		return curryMsg(x)
+	}
+function curryMsg(opts){
+		var defaultStatus="none"
+		var defaultTarget=$("#flash-msg")
+		return function(msg){
+				var stat=opts.st
+						|| (msg instanceof Error || msg.error || msg.status>=400) && "err"
+						|| defaultStatus;
+				var cont=opts.tgt || defaultTarget;
+				cont.html(
+						'<div class="msg-status round mv-1">'
+						+'<div class="d-fb">'
+						+'	<div>'
+						+'		<i class="msg-icon fa"></i>'
+						+'		<span class="msg-text">'
+						+'	</div>'
+						+'	<div>'
+						+'		<i class="fa fa-times msg-close"></i>'
+						+'	</div>'
+						+'</div>'
+						+'</div>'
+					)
+				cont.find(".msg-text").text(opts.msg
+						|| (!msg && " ")
+						|| msg.message
+						|| msg.error
+						|| (msg.responseJSON && (msg.responseJSON.message || msg.responseJSON.error))
+						|| msg.statusText
+						|| msg
+					)
+				cont.find(".msg-status").addClass(stat)
+				cont.find(".msg-icon").addClass({
+						"ok":"fa-check-circle",
+						"err":"fa-times-circle",
+						"warn":"fa-exclamation-triangle",
+						"info":"fa-info-circle",
+						"pending":"fa-spinner fa-pulse fa-fw"
+					}[stat])
+				cont.find(".msg-close").click(function(evt){
+						cont.empty().hide()
+					})
+				cont.show()
+			}
+	}
+</script>
+</html>
