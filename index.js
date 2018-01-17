@@ -13,7 +13,6 @@ const jsonValidate = require("jsonschema").validate
 const CSON = require("cursive")
 const didYouMean = require("didyoumean")
 
-
 var Promise = bb
 
 const blockstoreIndex = CSON.parse(fs.readFileSync(path.join(__dirname,"directory.cson")),{encoding:'utf8'})
