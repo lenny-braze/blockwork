@@ -1,13 +1,13 @@
 {
-  "name": "blooker",
-  "version": "0.0.0",
+  "name": "blockwork",
+  "version": "0.1.0",
   "description": "Looker block tool",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "blooker": "./index.js"
+    "blockwork": "./index.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "blob": "0.0.4",
     "bluebird": "^3.5.1",
     "cursive": "^0.3.0",
+    "didyoumean": "^1.2.1",
     "dot": "^1.1.2",
     "download-git-repo": "^1.0.2",
     "json-editor": "^0.7.28",
