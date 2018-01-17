@@ -125,8 +125,8 @@ async function config(b,options={}){
 				console.info(statusColor + "Your block configuration is " + configStatus+"\x1b[0m")
 				try{
 				if(config){console.log(config)}
-				if(configStatus == 'ok' && !options.silent){
-						cont = (await prompt.getp([{
+				if(configStatus == 'ok'){
+						cont = options.silent || (await prompt.getp([{
 								description:"Continue with the above config? (Yes/no)",
 								type:"string",
 								pattern:/yes|no|y|n/i,
@@ -150,8 +150,9 @@ async function config(b,options={}){
 		return true;
 	}
 async function compile(b){
+		var config
 		try{
-				const config = CSON.parse(fs.readFileSync(configPath(b),{encoding:'utf8'}))
+				config = CSON.parse(fs.readFileSync(configPath(b),{encoding:'utf8'}))
 			}catch(e){
 				console.error("Unexpected error reading config file during compile step. This should have been caught in earlier validation step")
 			}
@@ -159,7 +160,7 @@ async function compile(b){
 		if(!tFiles.length){console.warn("Warning: No template files were found.")}
 		tFiles.forEach(function(t){
 				const tFile=fs.readFileSync(t,{encoding:'utf8'})
-				var template
+				var template, output
 				try{
 						template = dot.template(tFile);
 					}catch(e){
@@ -168,6 +169,8 @@ async function compile(b){
 						throw "Unable to compile block template files. Please file an issue with the block maintainer"
 					}
 				try{
+						console.log(config)
+						console.log(template)
 						output = template(config)
 					}catch(e){
 						console.error("Error applying template file "+t)
