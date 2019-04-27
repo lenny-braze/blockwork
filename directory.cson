@@ -1,3 +1,7 @@
 redshiftAdmin: {
 	repo:"fabio-looker/blook-redshift-admin"
+},
+
+BrazeMessage: {
+	repo:"llooker/braze_message_engagement_block"
 }
